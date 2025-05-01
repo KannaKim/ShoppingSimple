@@ -1,103 +1,116 @@
+'use client'
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import getCookie from "./lib/cookie";
+
+const products = [
+  { id: 1, name: "Red Chair", price: 49.99, userId: "user123", image: "/res/product-1.jpg" },
+  { id: 2, name: "Tall Lamp", price: 89.99, userId: "user456", image: "/res/product-1.jpg" },
+  { id: 3, name: "Blue Sofa", price: 199.99, userId: "user789", image: "/res/product-1.jpg" },
+  { id: 4, name: "Coffee Table", price: 59.99, userId: "user321", image: "/res/product-1.jpg" },
+  { id: 5, name: "Small Plant", price: 15.99, userId: "user654", image: "/res/product-1.jpg" },
+  { id: 6, name: "Bookshelf", price: 120.00, userId: "user987", image: "/res/product-1.jpg" },
+];
+
+function LoginButton({ username, onLogout }) {
+  if (username !== "") {
+    return (
+      <div className="flex items-center gap-2">
+        <button className="ml-2 bg-gray-900 text-white px-4 py-2 rounded-md font-semibold shadow-sm cursor-default" disabled>{username}</button>
+        <button
+          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors font-semibold shadow-sm"
+          onClick={onLogout}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+  return (
+    <button className="ml-2 bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors font-semibold shadow-sm">
+      <Link href="/login" className="flex items-center">
+        Login
+      </Link>
+    </button>
+  );
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [search, setSearch] = useState("");
+  const [username, setUsername] = useState("");
+  useEffect(() => {
+    setUsername(getCookie("username"));
+  }, []);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Logout handler: clear the username cookie and update state
+  function handleLogout() {
+    document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    setUsername("");
+  }
+
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Sticky Top Bar */}
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
+        <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
+          <div className="text-xl font-bold text-blue-700 tracking-tight">ShopModern</div>
+          <form
+            className="flex flex-1 mx-6 max-w-md"
+            onSubmit={e => { e.preventDefault(); }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white shadow-sm"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors font-semibold shadow-sm"
+            >
+              Search
+            </button>
+          </form>
+          <LoginButton username={username} onLogout={handleLogout} />
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto px-4 py-10">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">Discover Great Products</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className="flex flex-col items-center bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-100 p-4 group aspect-square justify-between"
+            >
+              <div className="w-full flex-1 flex items-center justify-center">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  width={200}
+                  height={200}
+                  className="object-cover rounded-lg w-full h-full max-h-40 group-hover:scale-105 transition-transform bg-gray-100 border"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
+                />
+              </div>
+              <div className="w-full mt-4 flex flex-col items-center">
+                <div className="font-semibold text-lg text-gray-900 truncate text-center">{product.name}</div>
+                <div className="text-gray-500 text-sm mb-1 truncate text-center">Seller: {product.userId}</div>
+                <div className="text-blue-700 font-bold text-xl">${product.price.toFixed(2)}</div>
+              </div>
+            </div>
+          ))}
+          {filteredProducts.length === 0 && (
+            <div className="col-span-full text-center text-gray-400 py-12">No products found.</div>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }

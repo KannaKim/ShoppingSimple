@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -30,7 +30,7 @@ export default function LoginPage() {
           setError('Invalid username or password');
         }
         else{
-          // set cookie
+          redirect("/")
 
         }
       }

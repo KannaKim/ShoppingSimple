@@ -1,4 +1,5 @@
-import sql from '../lib/db.js';
+import sql from '../lib/db';
+import {createSession} from '../../lib/session';
 
 export async function POST(request) {
     // For example, fetch data from your DB here
@@ -19,7 +20,7 @@ export async function POST(request) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
-
+    await createSession(username)
     return new Response("success", {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
