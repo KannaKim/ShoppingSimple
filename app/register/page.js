@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -38,12 +38,26 @@ export default function RegisterPage() {
     }
 
     try {
-      // TODO: Implement actual registration
-      console.log('Registration attempt:', formData);
-      // For now, just redirect to home page
-      router.push('/');
+      fetch("/api/register-user", {
+        method: "POST",
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+          email: formData.email
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      }).then((response) => {
+        if (!response.ok) {
+          setError('email or id duplicate exist.'); // todo: be specific
+        }
+        else{
+          redirect("/")
+        }
+      });
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError('Unexpected Error occurred.');
     }
   };
 
@@ -73,14 +87,14 @@ export default function RegisterPage() {
                 Username
               </label>
               <input
-                id="name"
-                name="name"
+                id="username"
+                name="username"
                 type="text"
-                autoComplete="name"
+                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
-                value={formData.name}
+                value={formData.username}
                 onChange={handleChange}
               />
             </div>

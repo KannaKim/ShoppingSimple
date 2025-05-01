@@ -1,4 +1,4 @@
-import sql from './lib/db.js';
+import sql from '../lib/db.js';
 
 export async function GET(request) {
     // For example, fetch data from your DB here
