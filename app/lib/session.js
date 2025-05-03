@@ -4,7 +4,8 @@ import { cookies } from 'next/headers'
 
 const secretKey = process.env.SESSION_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
- 
+
+
 async function encrypt(payload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -12,7 +13,7 @@ async function encrypt(payload) {
     .setExpirationTime('7d')
     .sign(encodedKey)
 }
- 
+
 export async function decrypt(session) {
   try {
     const { payload } = await jwtVerify(session, encodedKey, {
@@ -33,13 +34,6 @@ export async function createSession(userId) {
   const cookieStore = await cookies()
  
   cookieStore.set('session', session, {
-    httpOnly: true,
-    secure: true,
-    expires: expiresAt,
-    sameSite: 'lax',  
-    path: '/',
-  })
-  cookieStore.set('test', "testing", {
     httpOnly: false,
     secure: true,
     expires: expiresAt,

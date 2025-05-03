@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [username, setUsername] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const imageInputRef = useRef();
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function Dashboard() {
       const res = await fetch('/api/products');
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
+    } catch (err) { 
       setError('Failed to fetch products');
     }
     setLoading(false);
@@ -60,7 +61,25 @@ export default function Dashboard() {
   }
 
   function handleImageChange(e) {
-    setForm(f => ({ ...f, imageFileName: e.target.files[0]?.name || '' }));
+    const file = e.target.files[0];
+    setForm(f => ({ ...f, imageFileName: file ? file.name : '' }));
+  }
+
+  async function handleDelete(productId) {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete product');
+      setSuccess('Product deleted successfully');
+      setDeleteConfirm(null);
+      fetchProducts();
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
   }
 
   return (
@@ -129,16 +148,60 @@ export default function Dashboard() {
         <div className="space-y-4">
           {products.length === 0 && <div>No products yet.</div>}
           {products.map(p => (
-            <div key={p.id} className="border rounded p-4 bg-white flex gap-4 items-center">
-              {p.image_url && <img src={p.image_url} alt={p.name} className="w-16 h-16 object-cover rounded" />}
-              <div>
-                <div className="font-bold">{p.name}</div>
-                <div className="text-blue-700 font-semibold">${p.price}</div>
-                <div className="text-gray-500 text-sm">{p.description}</div>
-                <div className="text-xs text-gray-400">By: {p.username}</div>
+            <div key={p.id} className="border rounded p-4 bg-white flex gap-6 items-center">
+              <div className="w-32 h-32 flex-shrink-0">
+                {p.img_filepath ? (
+                  <img 
+                    src={p.img_filepath} 
+                    alt={p.name} 
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400">No image</span>
+                  </div>
+                )}
               </div>
+              <div className="flex-1">
+                <div className="font-bold text-lg">{p.name}</div>
+                <div className="text-blue-700 font-semibold text-xl">${p.price}</div>
+                <div className="text-gray-500 text-sm mt-2">{p.description}</div>
+                <div className="text-xs text-gray-400 mt-2">By: {p.username}</div>
+              </div>
+              <button
+                onClick={() => setDeleteConfirm(p.id)}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                disabled={loading}
+              >
+                Delete
+              </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white/95 p-6 rounded-lg max-w-md w-full shadow-xl">
+            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
+            <p className="mb-4">Are you sure you want to delete this product? This action cannot be undone.</p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                disabled={loading}
+              >
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
