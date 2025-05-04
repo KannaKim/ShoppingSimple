@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import LoginButton from './components/LoginButton';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,9 @@ export default function RootLayout({ children }) {
               <Link href="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700">
                 ShoppingSimple
               </Link>
+              <div className="ml-auto">
+                <LoginButton></LoginButton>
+              </div>
             </div>
           </div>
         </header>
