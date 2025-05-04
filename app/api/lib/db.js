@@ -1,6 +1,5 @@
 // db.js
 import postgres from 'postgres'
-console.log(process.env.PASSWORD)
 const sql = postgres({
     host                 : process.env.HOST,            // Postgres ip address[s] or domain name[s]
     port                 : process.env.PSQL_PORT,          // Postgres server port[s]
