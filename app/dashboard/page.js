@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import getCookie from '../lib/cookie';
 
 export default function Dashboard() {
-  const [form, setForm] = useState({ name: '', price: '', description: '', imageFileName: '' });
+  const [form, setForm] = useState({ name: '', price: '', description: '', imageFileName: '', quantity: '' });
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,6 +41,7 @@ export default function Dashboard() {
       formData.append('price', form.price);
       formData.append('description', form.description);
       formData.append('username', username);
+      formData.append('quantity', form.quantity);
       if (imageInputRef.current.files[0]) {
         formData.append('image', imageInputRef.current.files[0]);
       }
@@ -51,7 +52,7 @@ export default function Dashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to add product');
       setSuccess('Product added!');
-      setForm({ name: '', price: '', description: '', imageFileName: '' });
+      setForm({ name: '', price: '', description: '', imageFileName: '', quantity: '' });
       if (imageInputRef.current) imageInputRef.current.value = '';
       fetchProducts();
     } catch (err) {
@@ -104,6 +105,15 @@ export default function Dashboard() {
           step="0.01"
           value={form.price}
           onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+          required
+        />
+        <input
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Quantity"
+          type="number"
+          min="1"
+          value={form.quantity}
+          onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))}
           required
         />
         <div>
@@ -167,6 +177,7 @@ export default function Dashboard() {
                 <div className="text-blue-700 font-semibold text-xl">${p.price}</div>
                 <div className="text-gray-500 text-sm mt-2">{p.description}</div>
                 <div className="text-xs text-gray-400 mt-2">By: {p.username}</div>
+                <div className="text-sm text-gray-600 mt-1">Quantity: {p.quantity}</div>
               </div>
               <button
                 onClick={() => setDeleteConfirm(p.id)}

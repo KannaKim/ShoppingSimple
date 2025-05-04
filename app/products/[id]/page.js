@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { redirect, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import stripe from 'stripe';
+import getCookie from '../../lib/cookie';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -34,6 +34,12 @@ export default function ProductDetail() {
     }
   }, [id]);
 
+  useEffect(() => {
+    if (!getCookie("session")) {
+      redirect("/login");
+    }
+  }, []);
+
   const handleCheckout = async () => {
     try {
       setCheckoutLoading(true);
@@ -45,6 +51,7 @@ export default function ProductDetail() {
         body: JSON.stringify({
           productId: id,
           name: product.name,
+          sessionCookie: getCookie("session")
         }),
       })
       const data = await res.json();
@@ -92,6 +99,7 @@ export default function ProductDetail() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
               <div className="text-2xl font-bold text-blue-600 mb-4">${parseFloat(product.price).toFixed(2)}</div>
               <div className="text-gray-500 text-sm mb-4">Seller: {product.username}</div>
+              <div className="text-gray-600 text-sm mb-4">Quantity Available: {product.quantity}</div>
               <div className="prose max-w-none">
                 <p className="text-gray-700">{product.description}</p>
               </div>

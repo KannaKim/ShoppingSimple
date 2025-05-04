@@ -27,7 +27,7 @@ export async function DELETE(request,{params}) {
 
 export async function GET(request, { params }) {
   try {
-    const { id } = await(params);
+    const { id } = await params;
     const [product] = await sql`SELECT * FROM products WHERE id = ${id}`;
     
     if (!product) {

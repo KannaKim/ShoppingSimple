@@ -9,6 +9,7 @@ export async function POST(request) {
     const formData = await request.formData()
     const name = formData.get('name');
     const price = formData.get('price');
+    const quantity = formData.get('quantity');
     const img = formData.get('image');
     if( !img ){
       return new Response(JSON.stringify({ error: 'Missing image file' }), { status: 400 });
@@ -33,8 +34,8 @@ export async function POST(request) {
     );
     try {
     const [product] = await sql`
-      INSERT INTO products (name, price, img_filepath, description, username)
-      VALUES (${name}, ${price}, ${filepath}, ${description}, ${username})
+      INSERT INTO products (name, price, quantity, img_filepath, description, username)
+      VALUES (${name}, ${price}, ${quantity}, ${filepath}, ${description}, ${username})
       RETURNING *;
     `;
     return new Response(JSON.stringify(product), { status: 201 });

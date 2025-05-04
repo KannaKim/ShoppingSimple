@@ -24,6 +24,9 @@ export default function ProductCard({ product }) {
         <p className="text-blue-600 font-bold mt-1">
           ${parseFloat(product.price).toFixed(2)}
         </p>
+        <div className="text-sm text-gray-600 mt-1">
+          Quantity Available: {product.quantity}
+        </div>
       </div>
     </Link>
   );
