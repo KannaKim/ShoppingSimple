@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import LoginButton from './components/LoginButton';
 import ProductCard from './components/ProductCard';
 
 export default function Home() {
@@ -30,13 +29,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Sticky Top Bar */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
-        <div className="max-w-3xl mx-auto flex items-center justify-end px-4 py-3">
-          <LoginButton />
-        </div>
-      </header>
-
       <main className="max-w-5xl mx-auto px-4 py-10">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">Discover Great Products</h1>
         {loading ? (

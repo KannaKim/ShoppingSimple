@@ -1,17 +1,21 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { redirect, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import stripe from 'stripe';
 
-export default function  ProductDetail({ params }) {
+export default function ProductDetail() {
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await fetch(`/api/products/${params.id}`);
+        const response = await fetch(`/api/products/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch product');
         }
@@ -25,10 +29,35 @@ export default function  ProductDetail({ params }) {
       }
     }
 
-    if (params.id) {
+    if (id) {
       fetchProduct();
     }
-  }, [params.id]);
+  }, [id]);
+
+  const handleCheckout = async () => {
+    try {
+      setCheckoutLoading(true);
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: id,
+          name: product.name,
+        }),
+      })
+      const data = await res.json();
+      console.log("data");
+      console.log(data);
+      window.location.href = data.url
+    } catch (err) {
+      setError(err.message);
+      console.error('Error during checkout:', err);
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (error) return <div className="text-center text-red-500 py-12">Error: {error}</div>;
@@ -59,13 +88,20 @@ export default function  ProductDetail({ params }) {
                 />
               </div>
             </div>
-            <div className="md:w-1/2 p-6">
+            <div className="flex flex-col md:w-1/2 p-6">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
               <div className="text-2xl font-bold text-blue-600 mb-4">${parseFloat(product.price).toFixed(2)}</div>
               <div className="text-gray-500 text-sm mb-4">Seller: {product.username}</div>
               <div className="prose max-w-none">
                 <p className="text-gray-700">{product.description}</p>
               </div>
+              <button
+                onClick={handleCheckout}
+                disabled={checkoutLoading}
+                className="cursor-pointer mt-auto bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {checkoutLoading ? 'Processing...' : 'Checkout'}
+              </button>
             </div>
           </div>
         </div>
